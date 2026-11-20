@@ -1313,27 +1313,68 @@ function giscusTheme() {
 }
 function mountGiscus(term) {
   const box = document.getElementById('giscusBox');
-  if (!box || box.firstChild) return;
+  if (!box || box.dataset.mounted === '1') return;
   if (!GISCUS.categoryId) {
     box.innerHTML = '<div class="giscus-pending">评论区正在配置中，稍后再来看看。</div>';
     return;
   }
-  const s = document.createElement('script');
-  s.src = 'https://giscus.app/client.js';
-  s.async = true;
-  s.crossOrigin = 'anonymous';
-  s.setAttribute('data-repo', GISCUS.repo);
-  s.setAttribute('data-repo-id', GISCUS.repoId);
-  s.setAttribute('data-category', GISCUS.category);
-  s.setAttribute('data-category-id', GISCUS.categoryId);
-  s.setAttribute('data-mapping', 'specific');
-  s.setAttribute('data-term', term);
-  s.setAttribute('data-reactions-enabled', GISCUS.reactionsEnabled);
-  s.setAttribute('data-emit-metadata', '0');
-  s.setAttribute('data-input-position', GISCUS.inputPosition);
-  s.setAttribute('data-theme', giscusTheme());
-  s.setAttribute('data-lang', GISCUS.lang);
-  box.appendChild(s);
+  box.dataset.mounted = '1';
+  let attempts = 0;
+  const MAX = 3;
+
+  function buildScript() {
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    s.setAttribute('data-repo', GISCUS.repo);
+    s.setAttribute('data-repo-id', GISCUS.repoId);
+    s.setAttribute('data-category', GISCUS.category);
+    s.setAttribute('data-category-id', GISCUS.categoryId);
+    s.setAttribute('data-mapping', 'specific');
+    s.setAttribute('data-term', term);
+    s.setAttribute('data-reactions-enabled', GISCUS.reactionsEnabled);
+    s.setAttribute('data-emit-metadata', '0');
+    s.setAttribute('data-input-position', GISCUS.inputPosition);
+    s.setAttribute('data-theme', giscusTheme());
+    s.setAttribute('data-lang', GISCUS.lang);
+    return s;
+  }
+  function showFailure() {
+    box.innerHTML = '<div class="giscus-pending"><span>评论加载失败，可能是网络问题。</span></div>';
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'btn btn-ghost btn-tiny'; b.textContent = '重新加载';
+    box.querySelector('.giscus-pending').appendChild(b);
+    b.addEventListener('click', () => {
+      delete box.dataset.mounted;
+      box.innerHTML = '';
+      mountGiscus(term);
+    });
+  }
+  function attempt() {
+    attempts += 1;
+    box.innerHTML = '';
+    const loading = document.createElement('div');
+    loading.className = 'giscus-pending';
+    loading.textContent = '评论加载中…（第 ' + attempts + ' 次尝试）';
+    box.appendChild(loading);
+    const s = buildScript();
+    s.onerror = () => {
+      if (attempts < MAX) setTimeout(attempt, 1500);
+      else showFailure();
+    };
+    box.appendChild(s);
+    setTimeout(() => {
+      if (box.querySelector('iframe.giscus-frame')) {
+        const l = box.querySelector('.giscus-pending');
+        if (l) l.remove();
+        return;
+      }
+      if (attempts < MAX) attempt();
+      else showFailure();
+    }, 6000);
+  }
+  attempt();
 }
 
 function render() {
