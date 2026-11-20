@@ -1,0 +1,46 @@
+[
+  {
+    "id": "home",
+    "type": "home",
+    "label": "首页",
+    "desc": "",
+    "icon": "home"
+  },
+  {
+    "id": "blog",
+    "type": "blog",
+    "label": "文章",
+    "desc": "",
+    "icon": "doc"
+  },
+  {
+    "id": "projects",
+    "type": "cards",
+    "label": "项目",
+    "desc": "随便搞的。",
+    "icon": "cube",
+    "data": "projects.json"
+  },
+  {
+    "id": "links",
+    "type": "cards",
+    "label": "友链",
+    "desc": "互相看得见的地方。想换链接的话，把信息发给我就好。",
+    "icon": "link",
+    "data": "links.json"
+  },
+  {
+    "id": "secret",
+    "type": "secret",
+    "label": "不要打开",
+    "desc": "",
+    "icon": "eye"
+  },
+  {
+    "id": "about",
+    "type": "about",
+    "label": "关于",
+    "desc": "",
+    "icon": "user"
+  }
+]
