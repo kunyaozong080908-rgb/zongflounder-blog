@@ -556,33 +556,7 @@ html[data-theme="light"] .moon{display:none}
       <span class="label">写文章</span>
     </button>
 
-    <nav class="nav" id="nav" aria-label="站内导航">
-      <a class="nav-item" data-nav="home" href="#/">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 10.6 12 4l8 6.6V19a1 1 0 0 1-1 1h-4.5v-6.2H9.5V20H5a1 1 0 0 1-1-1z"/></svg>
-        <span class="label">首页</span>
-      </a>
-      <a class="nav-item" data-nav="blog" href="#/blog">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3.5h7.5L18.5 8v12.5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z"/><path d="M13.2 3.8V8h4.3"/><path d="M8.4 12h7.2M8.4 15.4h5"/></svg>
-        <span class="label">文章</span>
-        <span class="count">0</span>
-      </a>
-      <a class="nav-item" data-nav="projects" href="#/projects">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3.6 19.6 7.8v8.4L12 20.4 4.4 16.2V7.8z"/><path d="M4.6 8 12 12.2l7.4-4.2M12 12.2v8"/></svg>
-        <span class="label">项目</span>
-      </a>
-      <a class="nav-item" data-nav="links" href="#/links">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10.2 14.2a3.6 3.6 0 0 1 0-5.1l2.2-2.2a3.6 3.6 0 0 1 5.1 5.1L15.7 14"/><path d="M13.8 9.8a3.6 3.6 0 0 1 0 5.1l-2.2 2.2a3.6 3.6 0 0 1-5.1-5.1L8.3 10.2"/></svg>
-        <span class="label">友链</span>
-      </a>
-      <a class="nav-item" data-nav="secret" href="#/secret">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.7 9.7 0 0 1 12 6c5 0 9 4.2 10 6a13 13 0 0 1-2.2 3.1"/><path d="M6.2 6.2C3.9 7.6 2.3 9.9 2 12c1 1.8 5 6 10 6a9.7 9.7 0 0 0 3.4-.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
-        <span class="label">不要打开</span>
-      </a>
-      <a class="nav-item" data-nav="about" href="#/about">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8.4" r="3.6"/><path d="M4.8 20c0-3.6 3.2-5.8 7.2-5.8s7.2 2.2 7.2 5.8"/></svg>
-        <span class="label">关于</span>
-      </a>
-    </nav>
+    <nav class="nav" id="nav" aria-label="站内导航"></nav>
 
     <div class="sidebar-foot">
       <button class="icon-btn" id="themeBtn" type="button" aria-label="切换明暗主题">
@@ -750,6 +724,8 @@ const PROJECTS_FILE = 'projects.json';
 const LINKS_FILE = 'links.json';
 const SECRET_FILE = 'secret.json';
 const SECRET_INTRO_FILE = 'secret-intro.json';
+const NAV_FILE = 'nav.json';
+const CUSTOM_PAGES_FILE = 'custom-pages.json';
 const TOKEN_KEY = 'zf-token';
 const REPO_API = 'https://api.github.com/repos/' + OWNER + '/' + REPO;
 const CONTENTS_API = REPO_API + '/contents/' + DATA_FILE;
@@ -777,6 +753,8 @@ let PROJECTS = [];
 let LINKS = [];
 let SECRET = [];
 let SECRET_INTRO = null;
+let NAV = [];
+let CUSTOM_PAGES = null;
 
 /* ---------- 默认内容（JSON 缺失时回退，保证页面始终成立） ---------- */
 const DEFAULT_PROJECTS = [
@@ -829,6 +807,32 @@ const DEFAULT_ABOUT_LINES = [
   '版权：文字与插图归本站所有，转载请注明出处。（如需补充，写在这里）',
 ];
 const DEFAULT_ABOUT = { body: DEFAULT_ABOUT_LINES.join(NL) };
+
+/* ---------- 图标库（栏目可选） ---------- */
+const ICONS = {
+  home: '<path d="M4 10.6 12 4l8 6.6V19a1 1 0 0 1-1 1h-4.5v-6.2H9.5V20H5a1 1 0 0 1-1-1z"/>',
+  doc: '<path d="M6 3.5h7.5L18.5 8v12.5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-16a1 1 0 0 1 1-1z"/><path d="M13.2 3.8V8h4.3"/><path d="M8.4 12h7.2M8.4 15.4h5"/>',
+  cube: '<path d="M12 3.6 19.6 7.8v8.4L12 20.4 4.4 16.2V7.8z"/><path d="M4.6 8 12 12.2l7.4-4.2M12 12.2v8"/>',
+  link: '<path d="M10.2 14.2a3.6 3.6 0 0 1 0-5.1l2.2-2.2a3.6 3.6 0 0 1 5.1 5.1L15.7 14"/><path d="M13.8 9.8a3.6 3.6 0 0 1 0 5.1l-2.2 2.2a3.6 3.6 0 0 1-5.1-5.1L8.3 10.2"/>',
+  eye: '<path d="M3 3l18 18"/><path d="M10.6 6.1A9.7 9.7 0 0 1 12 6c5 0 9 4.2 10 6a13 13 0 0 1-2.2 3.1"/><path d="M6.2 6.2C3.9 7.6 2.3 9.9 2 12c1 1.8 5 6 10 6a9.7 9.7 0 0 0 3.4-.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
+  user: '<circle cx="12" cy="8.4" r="3.6"/><path d="M4.8 20c0-3.6 3.2-5.8 7.2-5.8s7.2 2.2 7.2 5.8"/>',
+  star: '<path d="m12 3.8 2.4 5 5.5.8-4 3.9 1 5.5L12 21.4 7.1 19l1-5.5-4-3.9 5.5-.8z"/>',
+  note: '<path d="M6 4h10l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M9 12h6M9 15h6M9 9h4"/>',
+  bookmark: '<path d="M7 4h10a1 1 0 0 1 1 1v15l-6-3.6L6 20V5a1 1 0 0 1 1-1z"/>',
+  heart: '<path d="M12 20s-7-4.6-7-9.5A3.8 3.8 0 0 1 12 8a3.8 3.8 0 0 1 7 2.5C19 15.4 12 20 12 20z"/>',
+  tag: '<path d="M4 4h7l9 9-7 7-9-9z"/><circle cx="8.5" cy="8.5" r="1.4"/>',
+};
+const ICON_CHOICES = Object.keys(ICONS);
+
+/* ---------- 默认导航（nav.json 缺失时回退） ---------- */
+const DEFAULT_NAV = [
+  { id: 'home', label: '首页', desc: '', type: 'home', icon: 'home' },
+  { id: 'blog', label: '文章', desc: '', type: 'blog', icon: 'doc' },
+  { id: 'projects', label: '项目', desc: '做过的、正在做的小东西。', type: 'cards', icon: 'cube', data: PROJECTS_FILE },
+  { id: 'links', label: '友链', desc: '互相看得见的地方。想换链接的话，把信息发给我就好。', type: 'cards', icon: 'link', data: LINKS_FILE },
+  { id: 'secret', label: '不要打开', desc: '', type: 'secret', icon: 'eye' },
+  { id: 'about', label: '关于', desc: '', type: 'about', icon: 'user' },
+];
 
 /* ---------- 小工具 ---------- */
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -1075,6 +1079,37 @@ function tagsHtml(tags) {
   return tags.map((t) => '<a href="#/blog?tag=' + encodeURIComponent(t) + '">#' + esc(t) + '</a>').join('');
 }
 
+/* ---------- 导航数据与渲染 ---------- */
+function navEntries() { return NAV.length ? NAV : DEFAULT_NAV; }
+function findNav(id) { return navEntries().find((e) => e.id === id) || null; }
+function iconSvg(key) {
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">' +
+    (ICONS[key] || ICONS.note) + '</svg>';
+}
+function navHref(entry) {
+  if (entry.type === 'home') return '#/';
+  return '#/' + entry.id;
+}
+function renderNav(activeId) {
+  const navEl = $('#nav');
+  if (!navEl) return;
+  const editBtn = canWrite()
+    ? '<button class="btn btn-ghost btn-tiny" type="button" data-action="edit-nav" style="margin:.2rem 0 .7rem">编辑栏目</button>'
+    : '';
+  const items = navEntries().map((e) => {
+    const count = e.type === 'blog' ? '<span class="count">' + POSTS.length + '</span>' : '';
+    const active = e.id === activeId ? ' active' : '';
+    return '<a class="nav-item' + active + '" data-nav="' + esc(e.id) + '" href="' + navHref(e) + '">' +
+      iconSvg(e.icon) + '<span class="label">' + esc(e.label) + '</span>' + count + '</a>';
+  }).join('');
+  navEl.innerHTML = editBtn + items;
+}
+function pageHead(entry, actions) {
+  const desc = entry.desc ? '<p>' + esc(entry.desc) + '</p>' : '';
+  return '<header class="page-head"><h1>' + esc(entry.label) + '</h1>' + desc +
+    '<div class="head-actions">' + (actions || '') + '</div></header>';
+}
+
 /* ---------- 视图 ---------- */
 function viewHome() {
   const posts = allPosts();
@@ -1215,12 +1250,12 @@ function viewPost(id) {
 }
 
 function viewProjects() {
+  const entry = findNav('projects');
   const items = PROJECTS.length ? PROJECTS : DEFAULT_PROJECTS;
   const ownerActions = canWrite()
-    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-projects">编辑本页</button>'
+    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-projects">编辑本页内容</button>'
     : '';
-  const header =
-    '<header class="page-head"><h1>项目</h1><p>做过的、正在做的小东西。</p><div class="head-actions">' + ownerActions + '</div></header>';
+  const header = pageHead(entry, ownerActions);
   const grid =
     '<div class="simple-grid">' +
       items.map((i) => '<article class="card mini"><div class="meta">' + esc(i.meta) + '</div><h3>' + esc(i.title) + '</h3><p>' + esc(i.desc) + '</p><div class="foot">' + esc(i.foot) + '</div></article>').join('') +
@@ -1229,12 +1264,12 @@ function viewProjects() {
 }
 
 function viewLinks() {
+  const entry = findNav('links');
   const items = LINKS.length ? LINKS : DEFAULT_LINKS;
   const ownerActions = canWrite()
-    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-links">编辑本页</button>'
+    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-links">编辑本页内容</button>'
     : '';
-  const header =
-    '<header class="page-head"><h1>友链</h1><p>互相看得见的地方。想换链接的话，把信息发给我就好。</p><div class="head-actions">' + ownerActions + '</div></header>';
+  const header = pageHead(entry, ownerActions);
   const grid =
     '<div class="simple-grid" style="grid-template-columns:repeat(2,minmax(0,1fr))">' +
       items.map((i) => '<article class="card link-card"><div class="mark">' + esc(i.mark) + '</div><div><h3>' + esc(i.name) + '</h3><p>' + esc(i.desc) + '</p></div></article>').join('') +
@@ -1243,14 +1278,14 @@ function viewLinks() {
 }
 
 function viewSecret() {
+  const entry = findNav('secret');
   const items = SECRET;
-  const intro = SECRET_INTRO || DEFAULT_SECRET_INTRO;
+  const shown = Object.assign({}, entry, { desc: entry.desc || SECRET_INTRO || DEFAULT_SECRET_INTRO });
   const ownerActions = canWrite()
-    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-secret-intro">编辑说明文字</button>' +
-      '<button class="btn btn-ghost btn-tiny" type="button" data-action="edit-secret">编辑图片</button>'
+    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-secret">编辑图片</button>' +
+      '<button class="btn btn-ghost btn-tiny" type="button" data-action="edit-nav">编辑栏目/说明</button>'
     : '';
-  const header =
-    '<header class="page-head"><h1>不要打开</h1><p>' + esc(intro) + '</p><div class="head-actions">' + ownerActions + '</div></header>';
+  const header = pageHead(shown, ownerActions);
   if (!items.length) {
     const empty =
       '<div class="empty"><strong>这里还没有图片</strong>' +
@@ -1273,12 +1308,12 @@ function viewSecret() {
 }
 
 function viewAbout() {
+  const entry = findNav('about');
+  const shown = Object.assign({}, entry, { desc: entry.desc || ('你好，我是 ' + SITE.name + '，网名' + SITE.handle + '。') });
   const ownerActions = canWrite()
-    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-about">编辑本页</button>'
+    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-about">编辑本页内容</button>'
     : '';
-  const header =
-    '<header class="page-head"><h1>关于我</h1><p>你好，我是 ' + SITE.name + '，网名' + SITE.handle + '。</p>' +
-      '<div class="head-actions">' + ownerActions + '</div></header>';
+  const header = pageHead(shown, ownerActions);
 
   const data = ABOUT || DEFAULT_ABOUT;
   const body = renderBody(data.body || '');
@@ -1294,6 +1329,16 @@ function viewAbout() {
     : '';
 
   return header + '<div class="about-layout"><div class="about-main">' + sections + '</div>' + rail + '</div>';
+}
+
+function viewRich(entry) {
+  const ownerActions = canWrite()
+    ? '<button class="btn btn-primary btn-tiny" type="button" data-action="edit-rich" data-id="' + esc(entry.id) + '">编辑本页内容</button>'
+    : '';
+  const header = pageHead(entry, ownerActions);
+  const page = (CUSTOM_PAGES && CUSTOM_PAGES[entry.id]) || { body: '' };
+  const body = page.body ? renderBody(page.body) : '<div class="empty"><span>这里还空着，点「编辑本页内容」开始写。</span></div>';
+  return header + '<div class="prose">' + body + '</div>';
 }
 
 function viewNotFound() {
@@ -1391,14 +1436,25 @@ function render() {
     html = viewPost(id);
     route = findPost(id) ? 'post' : 'notfound';
   }
-  else if (parts[0] === 'projects') { html = viewProjects(); route = 'projects'; }
-  else if (parts[0] === 'links') { html = viewLinks(); route = 'links'; }
-  else if (parts[0] === 'secret') { html = viewSecret(); route = 'secret'; }
-  else if (parts[0] === 'about') { html = viewAbout(); route = 'about'; }
-  else { html = viewNotFound(); route = 'notfound'; }
+  else {
+    const entry = findNav(parts[0]);
+    if (!entry) { html = viewNotFound(); route = 'notfound'; }
+    else {
+      route = entry.id;
+      if (entry.type === 'cards') html = entry.id === 'projects' ? viewProjects() : viewLinks();
+      else if (entry.type === 'secret') html = viewSecret();
+      else if (entry.type === 'about') html = viewAbout();
+      else if (entry.type === 'rich') html = viewRich(entry);
+      else { html = viewNotFound(); route = 'notfound'; }
+    }
+  }
   view.innerHTML = html;
-  document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('active', a.dataset.nav === route));
-  document.title = route === 'home' ? SITE.name + ' • ' + SITE.handle + ' 的博客' : (ROUTE_NAMES[route] ? ROUTE_NAMES[route] + ' • ' : '') + SITE.name;
+  renderNav(route);
+  const activeEntry = findNav(route);
+  const titleLabel = activeEntry ? activeEntry.label : (ROUTE_NAMES[route] || '');
+  document.title = route === 'home'
+    ? SITE.name + ' • ' + SITE.handle + ' 的博客'
+    : (titleLabel ? titleLabel + ' • ' : '') + SITE.name;
   window.scrollTo({ top: 0 });
   bindJumps();
   updateCount();
@@ -1623,6 +1679,132 @@ function collectList() {
   return out;
 }
 
+/* ---------- 栏目（导航）编辑器 ---------- */
+let navRows = null;
+let richEditId = null;
+const NAV_TYPE_LABEL = {
+  home: '首页',
+  blog: '文章列表',
+  cards: '卡片列表页',
+  secret: '隐藏页',
+  about: '关于页',
+  rich: '自定义正文页',
+};
+function isBuiltinNav(id) { return DEFAULT_NAV.some((e) => e.id === id); }
+function uniqueNavId() {
+  const base = 'page-' + Date.now().toString(36);
+  const used = {};
+  navEntries().forEach((e) => { used[e.id] = true; });
+  navRows.forEach((e) => { used[e.id] = true; });
+  let id = base;
+  let n = 1;
+  while (used[id]) { id = base + '-' + n; n++; }
+  return id;
+}
+function navBlockHtml(row, i) {
+  const iconOptions = ICON_CHOICES.map((k) =>
+    '<option value="' + k + '"' + (k === row.icon ? ' selected' : '') + '>' + k + '</option>').join('');
+  const builtin = isBuiltinNav(row.id);
+  const moveButtons =
+    '<button type="button" class="btn btn-ghost btn-tiny" data-nav-move="up" ' + (i === 0 ? 'disabled' : '') + '>上移</button>' +
+    '<button type="button" class="btn btn-ghost btn-tiny" data-nav-move="down" ' + (i === navRows.length - 1 ? 'disabled' : '') + '>下移</button>';
+  const removeBtn = builtin ? '' :
+    '<button type="button" class="btn btn-danger btn-tiny" data-nav-remove>删除栏目</button>';
+  return '<div class="list-block" data-nav-id="' + esc(row.id) + '" style="border:1px solid hsl(var(--border));border-radius:.6rem;padding:1rem;display:flex;flex-direction:column;gap:.7rem;position:relative">' +
+    '<div class="field"><label>栏目名称（侧边栏显示的名字）</label>' +
+      '<input data-nav-field="label" autocomplete="off" value="' + esc(row.label) + '"></div>' +
+    '<div class="field"><label>栏目下方的一小排介绍（留空则不显示）</label>' +
+      '<input data-nav-field="desc" autocomplete="off" value="' + esc(row.desc || '') + '"></div>' +
+    '<div class="field"><label>图标</label>' +
+      '<select data-nav-field="icon">' + iconOptions + '</select></div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:.5rem;align-items:center">' +
+      '<span style="font-size:.75rem;color:hsl(var(--muted-fg))">类型：' + (NAV_TYPE_LABEL[row.type] || '自定义正文页') +
+      (builtin ? '（内置栏目，不可删除）' : '') + '</span>' +
+      moveButtons + removeBtn +
+    '</div>' +
+  '</div>';
+}
+function renderNavList() {
+  const blocks = navRows.map((row, i) => navBlockHtml(row, i)).join('');
+  $('#pageBody').innerHTML =
+    '<button type="button" class="btn btn-ghost" data-nav-add style="align-self:flex-start">+ 新增一个栏目（自定义正文页）</button>' +
+    '<div id="navWrap" style="display:flex;flex-direction:column;gap:1rem">' + blocks + '</div>';
+}
+function openNavEditor() {
+  if (!canWrite()) { openLogin(); return; }
+  pageMode = 'nav';
+  pageRows = null;
+  pageCfg = null;
+  richEditId = null;
+  navRows = navEntries().map((e) => Object.assign({}, e));
+  $('#pageTitle').textContent = '编辑侧边栏栏目';
+  renderNavList();
+  pageOverlay.classList.add('open');
+}
+function collectNavRows() {
+  const out = [];
+  $('#pageBody').querySelectorAll('.list-block').forEach((block) => {
+    const src = navRows.find((r) => r.id === block.dataset.navId) || {};
+    const o = { id: src.id, type: src.type, label: '', desc: '', icon: src.icon || 'note' };
+    if (src.data) o.data = src.data;
+    block.querySelectorAll('[data-nav-field]').forEach((inp) => {
+      const key = inp.dataset.navField;
+      if (key === 'label') o.label = inp.value.trim();
+      else if (key === 'desc') o.desc = inp.value.trim();
+      else if (key === 'icon') o.icon = inp.value;
+    });
+    out.push(o);
+  });
+  return out;
+}
+pageOverlay.addEventListener('click', (e) => {
+  if (pageMode !== 'nav') return;
+  const addBtn = e.target.closest('[data-nav-add]');
+  if (addBtn) {
+    navRows = collectNavRows();
+    navRows.push({ id: uniqueNavId(), label: '新栏目', desc: '', type: 'rich', icon: 'note' });
+    renderNavList();
+    return;
+  }
+  const rmBtn = e.target.closest('[data-nav-remove]');
+  if (rmBtn) {
+    const id = e.target.closest('.list-block').dataset.navId;
+    navRows = collectNavRows().filter((r) => r.id !== id);
+    renderNavList();
+    return;
+  }
+  const mvBtn = e.target.closest('[data-nav-move]');
+  if (mvBtn) {
+    const id = e.target.closest('.list-block').dataset.navId;
+    navRows = collectNavRows();
+    const i = navRows.findIndex((r) => r.id === id);
+    const j = mvBtn.dataset.navMove === 'up' ? i - 1 : i + 1;
+    if (i >= 0 && j >= 0 && j < navRows.length) {
+      const tmp = navRows[i]; navRows[i] = navRows[j]; navRows[j] = tmp;
+    }
+    renderNavList();
+  }
+});
+
+/* ---------- 自定义正文页编辑器 ---------- */
+function openRichEditor(id) {
+  if (!canWrite()) { openLogin(); return; }
+  const entry = findNav(id);
+  if (!entry || entry.type !== 'rich') return;
+  pageMode = 'rich';
+  pageRows = null;
+  pageCfg = null;
+  richEditId = id;
+  $('#pageTitle').textContent = '编辑「' + entry.label + '」';
+  const page = (CUSTOM_PAGES && CUSTOM_PAGES[id]) || { body: '' };
+  $('#pageBody').innerHTML =
+    '<div class="field"><label>正文（与文章同样的写法：## 标题、- 列表、**加粗**、独立一行放图片等）</label>' +
+    '<textarea id="pRichBody" spellcheck="false" style="min-height:20rem"></textarea></div>';
+  $('#pRichBody').value = page.body || '';
+  pageOverlay.classList.add('open');
+  setTimeout(() => $('#pRichBody').focus(), 30);
+}
+
 async function savePage() {
   const btn = $('#pageSave');
   btn.disabled = true;
@@ -1643,6 +1825,16 @@ async function savePage() {
     } else if (pageMode === 'secret') {
       SECRET = collectList();
       await commitJson(SECRET_FILE, SECRET, '更新「不要打开」页');
+    } else if (pageMode === 'nav') {
+      const rows = collectNavRows();
+      if (!rows.length) throw new Error('至少要保留一个栏目。');
+      if (rows.some((r) => !r.label)) throw new Error('每个栏目都要填写名称，空名称无法保存。');
+      NAV = rows;
+      await commitJson(NAV_FILE, NAV, '更新侧边栏栏目');
+    } else if (pageMode === 'rich') {
+      if (!CUSTOM_PAGES || typeof CUSTOM_PAGES !== 'object') CUSTOM_PAGES = {};
+      CUSTOM_PAGES[richEditId] = { body: $('#pRichBody').value };
+      await commitJson(CUSTOM_PAGES_FILE, CUSTOM_PAGES, '更新自定义页面');
     }
     closePage();
     render();
@@ -1660,6 +1852,8 @@ function closePage() {
   pageMode = null;
   pageRows = null;
   pageCfg = null;
+  navRows = null;
+  richEditId = null;
 }
 
 /* ---------- 导入 / 导出 ---------- */
@@ -1778,6 +1972,8 @@ document.addEventListener('click', (e) => {
   else if (act === 'edit-links') openListEditor('links');
   else if (act === 'edit-secret-intro') openSecretIntroEditor();
   else if (act === 'edit-secret') openListEditor('secret');
+  else if (act === 'edit-nav') openNavEditor();
+  else if (act === 'edit-rich') openRichEditor(el.dataset.id);
   else if (act === 'export') exportPosts();
   else if (act === 'import') $('#importFile').click();
 });
@@ -1860,6 +2056,8 @@ render();
     loadJson(LINKS_FILE, []),
     loadJson(SECRET_FILE, []),
     loadJson(SECRET_INTRO_FILE, null),
+    loadJson(NAV_FILE, []),
+    loadJson(CUSTOM_PAGES_FILE, null),
   ]);
   const posts = results[0];
   const about = results[1];
@@ -1867,12 +2065,16 @@ render();
   const links = results[3];
   const secret = results[4];
   const secretIntro = results[5];
+  const nav = results[6];
+  const customPages = results[7];
   POSTS = Array.isArray(posts) ? posts : [];
   ABOUT = about && typeof about === 'object' ? about : null;
   PROJECTS = Array.isArray(projects) ? projects : [];
   LINKS = Array.isArray(links) ? links : [];
   SECRET = Array.isArray(secret) ? secret : [];
   SECRET_INTRO = secretIntro && typeof secretIntro === 'object' && typeof secretIntro.intro === 'string' ? secretIntro.intro : null;
+  NAV = Array.isArray(nav) ? nav : [];
+  CUSTOM_PAGES = customPages && typeof customPages === 'object' ? customPages : null;
   render();
 })();
 </script>
